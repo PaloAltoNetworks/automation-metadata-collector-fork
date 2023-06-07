@@ -3,6 +3,17 @@ run-name: sync
 
 on:
   workflow_dispatch:
+    inputs:
+      cloud-id:
+        description: 'Which cloud to sync (aws, azure, gcp, all)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - aws
+          - azure
+          - gcp
   push: # for testing
     branches:
       - testing
@@ -111,11 +122,19 @@ jobs:
           tree "$SWFW_DIR"
           cd "$SWFW_DIR" && git status
 
+      - name: Generate GitHub token
+        id: generate-token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          # installation_id: ${{ secrets.APP_INSTALL_ID }}
+
       - name: Create pull request
         uses: peter-evans/create-pull-request@v5
         id: create-pull-request
         with:
-          token: ${{ secrets.TOKEN_FORK }}
+          token: ${{ steps.generate-token.outputs.token }}
           path: pan.dev
           branch: sync-terraform-module-docs
           delete-branch: true
