@@ -1,0 +1,11 @@
+name: Sync Terraform Modules
+run-name: sync
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "do nothing"
